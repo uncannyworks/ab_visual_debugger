@@ -9,6 +9,8 @@ var color_brushes = " ░▒▓█";
 var mechs = {};
 var projectiles = {};
 
+var error = false;
+
 AXEL.clear();
 
 var assign_hooks = function() {
@@ -25,26 +27,29 @@ var assign_hooks = function() {
     if(mechs[ServerClientObjectMoveMessage.objectId]){
       mechs[ServerClientObjectMoveMessage.objectId].position = normalize(ServerClientObjectMoveMessage.position);
       mechs[ServerClientObjectMoveMessage.objectId].rotation = ServerClientObjectMoveMessage.rotation;
-    }
-    if(projectiles[ServerClientObjectMoveMessage.objectId]){
+    } else if(projectiles[ServerClientObjectMoveMessage.objectId]){
       projectiles[ServerClientObjectMoveMessage.objectId].position = normalize(ServerClientObjectMoveMessage.position);
       projectiles[ServerClientObjectMoveMessage.objectId].rotation = ServerClientObjectMoveMessage.rotation;
     }
     render();
   };
   TOOLS.on_destroy_message_received = function(ServerClientObjectDestroyMessage) {
-    if(ServerClientObjectDestroyMessage.objectType == TOOLS.OBJECT_TYPES.Mech){
+    if(mechs[ServerClientObjectDestroyMessage.objectId]) {
       delete mechs[ServerClientObjectDestroyMessage.objectId];
-    }
-    if(ServerClientObjectDestroyMessage.objectType == TOOLS.OBJECT_TYPES.Projectile){
+    } else if(projectiles[ServerClientObjectDestroyMessage.objectId]){
       delete projectiles[ServerClientObjectDestroyMessage.objectId];
-    }    
+    } else {
+      error = true;
+      throw "Object Type: " + ServerClientObjectDestroyMessage.objectId + " NOT FOUND IN ANY LIST";
+    }
     render();
   };
 
   TOOLS.on_game_phase_end = function(){
     mechs = {};
     projectiles = {};
+    scale = 1.0;
+    error = false;
     render();
   }
 }
@@ -71,6 +76,9 @@ function normalize(position){
 }
 
 function render(){
+  if(error)
+    return;
+
   AXEL.clear();
   AXEL.text(0, 0, "Scale: " + scale);
   for(var propertyName in mechs) {    
@@ -107,7 +115,7 @@ function render(){
   for(var propertyName in projectiles) {        
     AXEL.brush = projectile_brushes[0];  
     AXEL.fg(128, 128, 0)    
-    AXEL.point(mechs[propertyName].position.x, mechs[propertyName].position.z);
+    AXEL.point(projectiles[propertyName].position.x, projectiles[propertyName].position.z);
   }
 
   AXEL.cursor.restore();
