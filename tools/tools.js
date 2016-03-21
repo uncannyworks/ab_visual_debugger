@@ -5,8 +5,15 @@ var Tools = function() {
   var self = this;
 
   this.OBJECT_TYPES = {
-    Mech: 2,
-    Projectile: 100   
+    Mech: 1,
+    Projectile: 100,
+    Missile: 120,
+    Rocket: 140,
+    Mortar: 160,
+    Beam: 180,
+    Explosion: 200,
+    Destroyed: 250,
+    Despawned: 251
   }
 
   /**

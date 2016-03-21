@@ -12,7 +12,7 @@ var projectiles = {};
 AXEL.clear();
 
 var assign_hooks = function() {
-  TOOLS.on_spawn_message_received = function(ServerClientObjectSpawnMessage) {  
+  TOOLS.on_spawn_message_received = function(ServerClientObjectSpawnMessage) {
     if(ServerClientObjectSpawnMessage.objectType == TOOLS.OBJECT_TYPES.Mech){
       mechs[ServerClientObjectSpawnMessage.objectId] = { position: normalize(ServerClientObjectSpawnMessage.position), rotation: ServerClientObjectSpawnMessage.rotation };
     }    
